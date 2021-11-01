@@ -7,7 +7,7 @@
 ### 一.从零开始自学Go语言 - 基础篇（已完结）
 
 <div style="text-align:center;margin: 0 auto;">
-    <img src="https://cdn.yuanketang.cn/images/courses/01/cover01.jpg" alt="从零开始自学Go语言 - 基础篇" width="960" />
+    <img src="https://cdn.yuanketang.cn/images/courses/01/cover.jpg" alt="从零开始自学Go语言 - 基础篇" width="960" />
 </div>
 
 0. [课程简介](https://www.bilibili.com/video/BV1qu411Z7ow/ "课程简介")
@@ -64,7 +64,7 @@
    * 1.1 Web工作原理
 
 <div style="text-align:center;margin: 0 auto;">
-    <img src="https://cdn.yuanketang.cn/images/courses/01/cover02.jpg" alt="从零开始自学Go语言 - 进阶篇" width="960" />
+    <img src="https://cdn.yuanketang.cn/images/courses/02/cover.jpg" alt="从零开始自学Go语言 - 进阶篇" width="960" />
 </div>
 
 ---
