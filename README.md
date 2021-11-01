@@ -61,7 +61,7 @@
 ### 二.从零开始学Go语言 - 进阶篇（持续更新中）
 
 <div style="text-align:center;margin: 0 auto;">
-    <img src="https://cdn.yuanketang.cn/images/courses/01/cover01.jpg" alt="从零开始自学Go语言 - 基础篇" width="960" />
+    <img src="https://cdn.yuanketang.cn/images/courses/01/cover02.jpg" alt="从零开始自学Go语言 - 进阶篇" width="960" />
 </div>
 
 ---
