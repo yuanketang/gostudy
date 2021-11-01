@@ -59,6 +59,7 @@
 <br/>
 
 ### 二.从零开始学Go语言 - 进阶篇（持续更新中）
+0. [课程简介](https://www.bilibili.com/video/BV1Aq4y1V7si "课程简介")
 1. Web编程基础
    * 1.1 Web工作原理
 
