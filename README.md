@@ -53,7 +53,7 @@
     * 8.2 [文档和示例](https://www.bilibili.com/video/BV16r4y1C7sV/ "文档和示例")
 
 <div style="text-align:center;margin: 0 auto;">
-    <img src="https://cdn.yuanketang.cn/images/courses/01/dir.jpg" alt="IT猿课堂" />
+    <img src="https://raw.githubusercontent.com/yuanketang/gostudy/master/images/course_dir.jpg" alt="IT猿课堂" />
 </div>
 
 <br/>
