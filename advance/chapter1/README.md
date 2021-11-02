@@ -55,7 +55,7 @@
 
 8.进行URL解析。
 
-9.返回结果给用户。
+9.处理请求并返回结果给用户。
 
 ##### DNS解析
  <div style="text-align:center;margin: 0 auto;">
