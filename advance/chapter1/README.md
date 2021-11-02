@@ -57,6 +57,11 @@
 
 9.返回结果给用户。
 
+##### DNS解析
+ <div style="text-align:center;margin: 0 auto;">
+    <img src="../../images/dns.png" alt="DNS解析" />
+</div>
+
 ##### URL(我们常说的网址)（URI 统一资源标识符 URL是URI的子集）
 
 URL(Uniform Resource Locator)是 `统一资源定位符` 的英文缩写，用于描述一个网络上的资源，基本格式如下:
