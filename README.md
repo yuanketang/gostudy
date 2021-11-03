@@ -61,7 +61,8 @@
 ### 二.从零开始学Go语言 - 进阶篇（持续更新中）
 0. [课程简介](https://www.bilibili.com/video/BV1Aq4y1V7si "课程简介")
 1. Web编程基础
-   * 1.1 Web工作原理
+   * 1.1 [Web工作原理](https://www.bilibili.com/video/BV1PS4y1d7GZ/ "Web工作原理")
+   * 1.2 [路由和路由处理器](https://www.bilibili.com/video/BV1C34y1o7fQ/ "路由和路由处理器")
 
 <div style="text-align:center;margin: 0 auto;">
     <img src="https://cdn.yuanketang.cn/images/courses/02/cover.jpg" alt="从零开始自学Go语言 - 进阶篇" width="960" />
