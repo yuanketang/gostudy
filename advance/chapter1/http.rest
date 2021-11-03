@@ -1,0 +1,16 @@
+GET http://127.0.0.1:8080/?name=xiaoli&password=123456 HTTP/1.1
+
+###
+
+GET http://127.0.0.1:8080/hello HTTP/1.1
+
+
+###
+GET http://127.0.0.1:8080/test?name=xiaowang&password=666666 HTTP/1.1
+
+###
+POST http://127.0.0.1:8080/test HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+name=小孙
+&password=aaaaaa

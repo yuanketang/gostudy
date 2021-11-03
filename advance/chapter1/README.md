@@ -2,7 +2,7 @@
 
 ### 第一章 Web编程基础
 ---
-1.Web工作原理
+#### 1. Web工作原理
 
 我们常说的Web服务一般指B/S架构，B（Browser）指的就是我们的浏览器充当客户端，S（Server）指我们的Web服务器，作为服务器提供相应的服务，比如网页托管，文件托管等等。
 
@@ -158,3 +158,131 @@ x-cache-webcdn: MISS from blzone02
  <div style="text-align:center;margin: 0 auto;">
     <img src="../../images/tcp.png" alt="三次握手，4次挥手" />
 </div>
+
+---
+
+#### 2. 路由和路由处理器
+
+##### 什么是Web路由？
+
+> 我们常说的Web路由，简单的说就是一种URL和函数的映射关系。
+
+
+```mermaid
+flowchart TD
+subgraph 图2    
+D[注册路由] --> E[关联路由处理函数并实现相应的功能逻辑] --> F[返回结果给终端浏览器用户]
+end
+
+subgraph 图1
+A[URL解析] --> B[响应并处理请求] --> C[返回结果给终端浏览器用户]
+end
+
+```
+
+   左图是我们一个浏览器请求Web服务响应流程图，对应到我们右图就是我们开发人员需要做的3件事：
+  
+  > 绑定一个特定的URL
+  关联一个特定的路由处理函数
+  完成功能并返回结果
+
+
+  ##### 路由一般分为以下2种：
+ 
+  <b style="font-size:14px">静态路由</b>
+   
+   ```
+   GET  /users   #获取用户列表
+   POST /users   #创建一个新用户
+   PUT  /users   #更新用户信息
+   ...
+   ```
+
+   <b style="font-size:14px">动态路由</b>
+
+   ```
+   DELETE /users/:id   #比如id为1时表示删除ID为1的用户
+   GET    /users/:id   #比如id为1时表示获取ID为1的用户信息
+   ...
+
+   ```
+
+   以上这种语义化的路由方式，我们也称为是一种 `REST API` (Representational State Transfer)，也可以理解为我们常说的 `CRUD` （增删改查）
+
+   > C(Create) 增
+   R(Read)     查
+   U(Update)   改
+   D(Delete)   删
+  
+  ##### 路由处理器
+  
+  关联某个特定路由的函数或方法，一般实现具体某些功能和业务逻辑并组合数据呈现给用户，这类函数或方法我们就称为 `路由处理程序`。（对应我们HTTP中的请求处理 `Request` 和响应 `Response`）
+
+  http.Request
+  > .Host 获取主机名称和端口号
+	.Header 获取请求头
+	.Method 获取请求方法类型，如GET, POST
+	.URL.RawQuery 获取query-string
+	.URL.Fragment 获取anchor
+	.Referer() 获取请求来源
+	.UserAgent() 获取浏览器特征
+  .ParseForm() 将表单或query-string解析成map结构
+	.ParseMultipartForm() 一般用于处理文件上传
+	.Form.Encode() 对表单进行Url编码，对空格和特殊字符进行编码
+  .Form.Get(key) 使用键名获取参数值
+	.FormValue(key) 使用键名获取参数值
+
+  http.ResponseWrite
+  > .WriteHeader(code) 设置响应头 HTTP 状态码
+	.Write([]byte) 设置响应体
+
+  http.StatusXXX定义了完整的HTTP状态码
+  > http.StatusOk -> 200
+  ...
+
+  方式一:
+
+  ```go
+  package main
+
+  import "net/http"
+
+  // 实现一个自定义http.Handler
+  type MyHandle struct{}
+
+  // 实现接口中定义的方法
+func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
+}
+
+  func main() {
+
+    // 注册路由，这里'/'表示匹配web服务根路径，它是一个默认资源路径
+    // 使用自定义类型方式
+    http.Handle("/", &MyHandle{})
+    // 使用匿名函数方式
+    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+    })
+    // 启动服务并监听8080端口，这里:8080表示绑定所有可用接口，而不仅仅是具有给定主机地址的接口。
+    http.ListenAndServe(":8080", nil)
+
+    // 绑定本地网卡IP内网IP地址为192.167.1.2接口的8080端口（具有给定主机地址）
+    // http.ListenAndServe("192.168.1.2:8080", nil)
+  }
+  ```
+
+  `DefaultServeMux`
+
+  ServeMux默认实现，需要注意的是DefaultServeMux是一个全局变量，容易被污染。
+  ```go
+  http.ListenAndServe(":8080", nil)
+  ```
+
+  正确的使用方式：
+  ```go
+  mu := http.NewServeMux()
+
+  // mu.handelFunc(path, handler)
+  //...
+  // 监听任意地址的的8080端口，并绑定路由处理器
+  http.ListenAndServe(":8080", mu)
+  ```
