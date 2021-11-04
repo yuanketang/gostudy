@@ -7,6 +7,7 @@
 我们常说的Web服务一般指B/S架构，B（Browser）指的就是我们的浏览器充当客户端，S（Server）指我们的Web服务器，作为服务器提供相应的服务，比如网页托管，文件托管等等。
 
 我们看下在浏览器中输入一个网址后发生了什么？
+
 ```mermaid
  flowchart TD
 
@@ -59,7 +60,7 @@
 
 ##### DNS解析
  <div style="text-align:center;margin: 0 auto;">
-    <img src="../../images/dns.png" alt="DNS解析" />
+    <img src="images/dns.png" alt="DNS解析" />
 </div>
 
 ##### URL(我们常说的网址)（URI 统一资源标识符 URL是URI的子集）
@@ -157,7 +158,7 @@ x-cache-webcdn: MISS from blzone02
 
 ##### 三次握手，4次挥手
  <div style="text-align:center;margin: 0 auto;">
-    <img src="../../images/tcp.png" alt="三次握手，4次挥手" />
+    <img src="images/tcp.png" alt="三次握手，4次挥手" />
 </div>
 
 ---
@@ -364,30 +365,32 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
   err := r.ParseMultipartForm(maxMemory)
   // r.MultipartForm.File 返回是一个map[string]*FileHeader类型，内部实现的
   headers := r.MultipartForm.File
-  for _, fh := range headers { // 遍历Map
-			for _, file := range fh { // 遍历切片 []*FileHeader
-        // 设置文件保存路径（这里使用绝对路径） './'代表应用程序根路径
-				fileSavePath := filepath.Join("./", file.Filename)
+  // 遍历Map
+  for _, fh := range headers {
+    // 遍历切片 []*FileHeader
+    for _, file := range fh {
+      // 设置文件保存路径（这里使用绝对路径） './'代表应用程序根路径
+      fileSavePath := filepath.Join("./", file.Filename)
 
-        // 打开原文件作为输入
-				src, err := file.Open()
-				if err != nil {
-					panic(err)
-				}
-				defer src.Close()
+      // 打开原文件作为输入
+      src, err := file.Open()
+      if err != nil {
+        panic(err)
+      }
+      defer src.Close()
 
-        // 创建一个空文件作为输出
-				dst, err := os.Create(fileSavePath)
-				if err != nil {
-					panic(err)
-				}
-				defer dst.Close()
+      // 创建一个空文件作为输出
+      dst, err := os.Create(fileSavePath)
+      if err != nil {
+        panic(err)
+      }
+      defer dst.Close()
 
-        // io.Copy使用字节拷贝方式将输入写入输出
-				_, err = io.Copy(dst, src)
-				if err != nil {
-					panic(err)
-				}
-			}
-		}
+      // io.Copy使用字节拷贝方式将输入写入输出
+      _, err = io.Copy(dst, src)
+      if err != nil {
+        panic(err)
+      }
+    }
+	}
   ```
