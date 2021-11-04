@@ -39,8 +39,8 @@
 
 ```shell
 # localhost name resolution is handled within DNS itself.
-#       127.0.0.1       localhost
-#       ::1             localhost
+127.0.0.1       localhost
+::1             localhost
 ```
 
 3.如果本地hosts有匹配，发起系统调用。
@@ -65,6 +65,7 @@
 ##### URL(我们常说的网址)（URI 统一资源标识符 URL是URI的子集）
 
 URL(Uniform Resource Locator)是 `统一资源定位符` 的英文缩写，用于描述一个网络上的资源，基本格式如下:
+
 ```
 scheme://host[:port#]/path/.../[?query-string][#anchor]
 scheme         指定使用的协议(例如：http, https, ftp)
@@ -89,7 +90,7 @@ anchor         锚点（hash哈希）
 
 ##### HTTP 请求示例
 
-```http
+```shell
 #请求行
 GET https://www.bilibili.com/ HTTP/1.1
 #请求头
@@ -104,7 +105,7 @@ x-request-id: 123456
 
 ##### HTTP 响应示例
 
-```http
+```shell
 #响应行
 HTTP/1.1 200 OK
 #响应头
@@ -242,7 +243,7 @@ end
 
   方式一:
 
-  ```go
+  ```shell
   package main
 
   import "net/http"
@@ -273,16 +274,120 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
   `DefaultServeMux`
 
   ServeMux默认实现，需要注意的是DefaultServeMux是一个全局变量，容易被污染。
-  ```go
+  ```shell
   http.ListenAndServe(":8080", nil)
   ```
 
   正确的使用方式：
-  ```go
+  ```shell
   mu := http.NewServeMux()
 
   // mu.handelFunc(path, handler)
   //...
   // 监听任意地址的的8080端口，并绑定路由处理器
   http.ListenAndServe(":8080", mu)
+  ```
+
+  #### 3. 表单进阶
+
+  * JSON处理
+  示例代码：
+  ```shell
+  // 定义结构体并添加标签
+  type User struct {
+    Id int        `json:"id"`
+    Name string   `json:"name"`
+  }
+  
+  // 读取请求体内容
+  bytes, err := ioutil.ReadAll(r.Body)
+  if err != nil {
+    // 处理异常
+  }
+  // 防止内存溢出
+  defer r.Body.Close()
+  // ...
+  var t User
+  err = json.Unmarshal(bytes, &t) // 注意第二个参数是一个指针
+  if err != nil {
+    // 处理异常
+  }
+  // 其他业务逻辑
+  
+  ```
+  * 表单验证
+  
+  ```shell
+  # 安装依赖
+  go get -u github.com/go-playground/validator/v10
+  ```
+
+  ```shell
+  // 定义结构体并添加标签和验证方式
+  type User struct {
+    Id int        `json:"id" validate:"gt=0"`
+    Name string   `json:"name" validate:"required"`
+    Password string   `json:"password" validate:"required"`
+  }
+  
+  // 读取请求体内容
+  bytes, err := ioutil.ReadAll(r.Body)
+  if err != nil {
+    // 处理异常
+  }
+  // 防止内存泄露
+  defer r.Body.Close()
+  // ...
+  var user User
+  err = json.Unmarshal(bytes, &user) // 注意第二个参数是一个指针
+  if err != nil {
+    // 处理异常
+  }
+  // 表单验证
+  // 初始化一个validator
+  validator := validator.New()
+  err = validator.struct(t)
+  if err != nil {
+    // 验证失败处理逻辑
+    // ...
+  }
+  // 验证通过，正常逻辑
+  ```
+
+  > API文档：https://pkg.go.dev/gopkg.in/go-playground/validator.v10
+  
+  
+  * 文件上传
+  ```shell
+  const maxMemory = 10 << 20 // 10M
+  // 解析multipart-data, 注意第二个参数为字节数
+  err := r.ParseMultipartForm(maxMemory)
+  // r.MultipartForm.File 返回是一个map[string]*FileHeader类型，内部实现的
+  headers := r.MultipartForm.File
+  for _, fh := range headers { // 遍历Map
+			for _, file := range fh { // 遍历切片 []*FileHeader
+        // 设置文件保存路径（这里使用绝对路径） './'代表应用程序根路径
+				fileSavePath := filepath.Join("./", file.Filename)
+
+        // 打开原文件作为输入
+				src, err := file.Open()
+				if err != nil {
+					panic(err)
+				}
+				defer src.Close()
+
+        // 创建一个空文件作为输出
+				dst, err := os.Create(fileSavePath)
+				if err != nil {
+					panic(err)
+				}
+				defer dst.Close()
+
+        // io.Copy使用字节拷贝方式将输入写入输出
+				_, err = io.Copy(dst, src)
+				if err != nil {
+					panic(err)
+				}
+			}
+		}
   ```

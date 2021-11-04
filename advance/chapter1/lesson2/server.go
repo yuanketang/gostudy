@@ -55,7 +55,7 @@ type MyHandler struct {
 
 func (h *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Printf("你好，世界, %d", h.Id)))
+	w.Write([]byte(fmt.Sprintf("你好，世界, %d", h.Id)))
 }
 
 func main() {
