@@ -359,8 +359,10 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
   
   
   * 文件上传
+
   ```shell
-  const maxMemory = 10 << 20 // 10M
+  // 10M
+  const maxMemory = 10 << 20
   // 解析multipart-data, 注意第二个参数为字节数
   err := r.ParseMultipartForm(maxMemory)
   // r.MultipartForm.File 返回是一个map[string]*FileHeader类型，内部实现的
@@ -392,5 +394,138 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
         panic(err)
       }
     }
-	}
+  }
   ```
+
+  #### 4. Web服务的认证与鉴权（上）
+  
+  ##### 为什么需要认证和鉴权？
+
+  在实际的工作和生活中，我们往往需要对我们使用的资源进行合理的分配和安全隔离，因此我们就需要某种认证和鉴权的机制。比如，在公司我们需要请假，需要上我们的上级领导申请或同时也需要向人事部门申请，这就是一个需要认证和鉴权的场景。
+  
+  而对于的Web服务来说，我们经常使用以下几种认证和鉴权的方式：
+  
+  ##### 账户和密码
+
+  > 概念
+
+  是一种通过为不同的账户分配密码的方式而采取的授权策略。（适合非常简单的应用）
+
+  ##### OAuth（Open Authorization）2.0
+
+  > 概念
+
+  `OAuth` 2.0是用于授权的安全、开放的行业标准协议。是一种无需使用用户名和密码而采用 `用户` `授权` 的方式，允许 `第三方应用` 访问用户在另外的 `服务提供者`上的存储的信息。这里的2.0是它的协议版本。
+
+  比如哔哩哔哩的App有微信登录功能，在这里 `第三方应用` 就是指哔哩哔哩，`用户` 就是指使用者，哔哩哔哩要获取你的微信头像和昵称等信息就要获得你的授权，然后从微信服务器获得数据，微信服务器就是这里的 `服务提供者`。
+
+  那么这些常见的如第三方App微信登录、支付宝登录、新浪微博登录等等，这些都属于采用OAuth协议来进行认证和鉴权的应用。
+
+  > 授权模式
+
+  在OAuth标准中定义了以下几种授权模式：
+  
+  <b>`Authorization Code` 授权码</b>
+  <b>`Client Credentials` 客户端凭证</b>
+  `PKCE` 授权码模式的增强版（用于防范跨站攻击）
+  `Device Code` 设备代码
+  `Refresh Token` 刷新令牌
+  `Legacy: Implicit Flow` 隐式流
+  `Legacy: Password Grant` 密码
+
+  > 授权码模式
+
+  ```mermaid
+  sequenceDiagram
+    autonumber
+    哔哩哔哩 ->> 用户: 请求使用微信登录
+    用户 -->> 微信认证服务器: 请求授权码
+    activate 微信认证服务器
+    微信认证服务器 -->> 哔哩哔哩: 返回授权码
+    deactivate 微信认证服务器
+    哔哩哔哩 ->> 微信认证服务器: 使用授权码申请令牌
+    activate 微信认证服务器
+    微信认证服务器 -->> 哔哩哔哩: 返回令牌
+    deactivate 微信认证服务器
+    哔哩哔哩 ->> 微信数据服务器: 使用令牌请求数据
+    activate 微信数据服务器
+    微信数据服务器 -->> 哔哩哔哩: 返回数据
+    deactivate 微信数据服务器
+  ```
+
+  > 客户端凭证
+
+  ```mermaid
+  sequenceDiagram
+    autonumber
+    哔哩哔哩 ->> 阿里云认证服务器: 使用app_id和app_secret请求认证
+    activate 阿里云认证服务器
+    阿里云认证服务器 -->> 哔哩哔哩: 返回令牌
+    deactivate 阿里云认证服务器
+    哔哩哔哩 ->> 阿里云服务: 使用令牌请求数据
+    activate 阿里云服务
+    阿里云服务 -->> 哔哩哔哩: 返回数据
+    deactivate 阿里云服务
+  ```
+
+  ##### JWT(Json web token)
+
+  > 概念
+
+  `JWT` 是一种基于JSON的开放标准，是一种不需要在服务端去保留用户的认证信息或者会话信息的对用户信息进行认证方式。
+
+  ```mermaid
+  sequenceDiagram
+    autonumber
+    哔哩哔哩 ->> 用户: 要求用户登录
+    用户 ->> 哔哩哔哩认证服务器: 使用账户和密码登录
+    activate 哔哩哔哩认证服务器
+    哔哩哔哩认证服务器 -->> 哔哩哔哩: 返回令牌
+    deactivate 哔哩哔哩认证服务器
+    哔哩哔哩 ->> 哔哩哔哩数据服务器: 携带令牌请求数据
+    activate 哔哩哔哩数据服务器
+    哔哩哔哩数据服务器 -->> 哔哩哔哩: 返回数据
+    deactivate 哔哩哔哩数据服务器
+  ```
+
+  `JWT` 分为三部分：
+
+  > 1-请求头（Header）
+  
+  用于请求时携带令牌，一般采用Bearer token方式，令牌需要客户端保存，比如存储在浏览器Cookie或LocalStorage中
+  
+  ```shell
+  # base64编码
+  Content-Type: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ5dWFua2V0YW5nIiwiaWF0IjoiMjAyMS0xMS0wNSAwMDowMDowMCIsImV4cCI6IjIwMjEtMTEtMjcgMDA6MDA6MDAiLCJpZCI6IjEifQ.G--jJTGq7g7uIbl-_nlW6HkpGrhWMK0y2w6W6KuIELI
+  ```
+
+  > 2-载荷（Payload）（可以理解为请求体）也就是实际存储的有效信息
+
+  公共部分
+
+  `iss`: 签发机构。
+  `iat`: 签发时间。
+  `exp`: 过期时间，这个过期时间必须要大于签发时间。
+  `nbf`: 定义在什么时间之前是不可用的。
+  `jti`: 唯一身份标识，主要用防范攻击。
+
+  私有部分
+
+  添加自定义数据，比如一个UUID
+
+  ```javascript
+  {
+    "iss": "yuanketang",
+    "iat": "2021-11-05 00:00:00",
+    "exp": "2021-11-06 00:00:00",
+    "uuid": "068bbf4e-2bb5-4a4b-9d6f-9dc8ee4939c3"
+  }
+  ```
+
+  > 3-签名（Signature）
+  
+  header (base64后的)
+  payload (base64后的)
+  secret 随机加密值
+
+  [在线生成JWT](https://tooltt.com/jwt-encode/ "在线生成JWT")
