@@ -1,4 +1,4 @@
-![从零开始自学Go语言 - 进阶篇](https://cdn.yuanketang.cn/images/courses/01/cover.jpg)
+![从零开始自学Go语言 - 进阶篇](https://cdn.yuanketang.cn/images/courses/02/cover.jpg)
 
 ### 第一章 Web编程基础
 ---
