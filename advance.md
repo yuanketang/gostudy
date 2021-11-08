@@ -513,7 +513,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
   添加自定义数据，比如一个UUID
 
-  ```javascript
+  ```shell
   {
     "iss": "yuanketang",
     "iat": "2021-11-05 00:00:00",
@@ -529,3 +529,89 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
   secret 随机加密值
 
   [在线生成JWT](https://tooltt.com/jwt-encode/ "在线生成JWT")
+
+  #### 4. Web服务的认证与鉴权（中）
+
+  需要安装的依赖
+  ```shell
+  go get -u golang.org/x/oauth2
+  go get -u github.com/go-oauth2/oauth2/v4
+  ```
+  
+  ##### 授权码模式的实现
+
+  > 服务端实现
+
+  ```shell
+  // 步骤一：初始化一个Manager并配置
+  // Manager 认证管理器
+  manager := manage.NewDefaultManager()
+  // 设置Token默认时间
+  manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
+  // Token存储位置
+  manager.MustTokenStorage(store.NewMemoryTokenStore())
+  // Token的生成方式
+  manager.MapAccessGenerate(generates.NewAccessGenerate)
+
+  // 步骤二：初始化一个ClientStore并纳入Manager管理
+  // 客户端信息配置
+  clientStore := store.NewClientStore()
+  _ = clientStore.Set("每个单独的应用编号", &models.Client{
+    ID:     "客户端ID",
+    Secret: "客户端Secret",
+    Domain: "客户端地址",
+  })
+  // 将客户端信息纳入Manager管理
+  manager.MapClientStorage(clientStore)
+  
+  // 步骤三：初始化一个认证服务器并配置
+  // OAuth 认证服务器
+  // 参数1 初始化配置
+  // 参数2 认证管理器
+  server := server.NewServer(server.NewConfig(), manager)
+
+  // 是否允许使用GET方式传递token
+  srv.SetAllowGetAccessRequest(true)
+
+  // 处理颁发Token（重要）必须实现
+  // 参数1 http.ResponseWriter
+  // 参数2 *http.Request
+  srv.HandleTokenRequest(w http.ResponseWriter, r *http.Request)
+
+  // 处理验证Token（重要）
+  // 参数 *http.Request
+  srv.ValidationBearerToken(r *http.Request)
+  ```
+
+  > 客户端实现
+
+  ```shell
+  config = oauth2.Config{
+    ClientID:     "客户端ID",
+    ClientSecret: "客户端Secret",
+    Scopes:       []string{"自定义scope"},
+    RedirectURL:  "获取code回调地址",
+    Endpoint: oauth2.Endpoint{
+      AuthURL:  "授权请求地址", // 授权码模式需要配置
+      TokenURL: "申请令牌地址", // 必须配置
+    },
+  }
+
+  // 请求鉴权的URL
+  config.AuthCodeURL("自定义state")
+
+  // 用授权码换取Token
+  token, err := config.Exchange(context.Background(), code)
+  ```
+
+  ##### 客户端凭证模式的实现
+
+  ```shell
+  clientCfg := clientcredentials.Config{
+    ClientID:     "客户端ID",
+    ClientSecret: "客户端ID",
+    TokenURL:     "申请令牌地址",
+  }
+  
+  token, err := clientCfg.Token(context.Background())
+  ```

@@ -1,10 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>微信登录</title>
+    <style>
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 400px;
+            border-radius: 5px;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #efefef;
+            color: #fff;
+        }
+        button {
+            background: #f60;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            width: 200px;
+        }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <form method="post" action="/auth">
+        <button type="submit">微信登录</button>
+    </form>
+</div>
 </body>
 </html>
