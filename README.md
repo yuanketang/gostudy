@@ -70,6 +70,7 @@
    * 1.2 [路由和路由处理器](https://www.bilibili.com/video/BV1C34y1o7fQ/ "路由和路由处理器")
    * 1.3 [表单进阶](https://www.bilibili.com/video/BV1iF411a72a/ "表单进阶")
    * 1.4 [认证与鉴权（上）](https://www.bilibili.com/video/BV1Sq4y1g7AW/ "认证与鉴权（上）")
+   * 1.5 [认证与鉴权（中）](https://www.bilibili.com/video/BV1BT4y1979M/ "认证与鉴权（中）")
 
 ---
 
