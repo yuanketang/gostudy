@@ -530,7 +530,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
   [在线生成JWT](https://tooltt.com/jwt-encode/ "在线生成JWT")
 
-  #### 4. Web服务的认证与鉴权（中）
+  #### 5. Web服务的认证与鉴权（中）
 
   需要安装的依赖
   ```shell
@@ -615,3 +615,53 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
   
   token, err := clientCfg.Token(context.Background())
   ```
+
+#### 6. Web服务的认证与鉴权（下）
+> 安装依赖
+
+```shell
+go get github.com/dgrijalva/jwt-go
+```
+
+> 创建JWT Token
+
+```shell
+// 使用claim创建一个JWT Token
+// 参数一：加密方式
+// 参数二：claim 可以理解为payload
+token := jwt.NewWithClaims(jwt.SigningMethodHS512, &jwt.StandardClaims{
+  IssuedAt: time.Now().Unix(),
+  ExpiresAt: time.Now().Add(time.Second * 60).Unix(),
+  Issuer: "yuanketang",
+})
+
+// 对token进行签名
+tokenStr := token.SignedString(秘钥)
+// ...
+```
+
+> 解析JWT Token
+
+```shell
+// 解析Token
+// 参数一：JWT Token String
+// 参数二：claim
+// 参数三：回调函数
+token, err := jwt.ParseWithClaims(tokenStr, &jwt.StandardClaims{}, func(token *Token) (interface{}, error){
+  return 秘钥, nil
+})
+
+// 捕获特定类型的错误
+if err != nil {
+  if jwtErr, ok := err.(*jwt.ValidationError); ok {
+        if jwtErr.Errors == jwt.ValidationErrorExpired {
+            http.Error(writer, "Token过期了", http.StatusBadRequest)
+            return
+        }
+    }
+}}
+
+// 判断token是否正确
+token.Valid
+// ...
+```
