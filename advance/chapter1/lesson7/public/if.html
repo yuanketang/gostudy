@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>if</title>
+</head>
+<body>
+<p>编号：{{.Id}}</p>
+<p>姓名：{{.Name}}</p>
+<p>年龄：{{.Age}}</p>
+<p>性别if：{{if .Sex}} 男生 {{ else }} 女生 {{ end }}</p>
+<p>性别with：{{with .Sex}} 男生 {{ else }} 女生 {{ end }}</p>
+<p>省份：{{.Addr.Province}}</p>
+<p>城市：{{.Addr.City}}</p>
+<p>街道：{{.Addr.Street}}</p>
+</body>
+</html>

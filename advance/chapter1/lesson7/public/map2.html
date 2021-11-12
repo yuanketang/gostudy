@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Map2</title>
+</head>
+<body>
+<!-- for x := range xxx -->
+<!-- for a,b := range xxx {
+
+}-->
+
+{{ range $x := . }}
+<p>编号：{{.id}}</p>
+<p>价格：{{.price}}</p>
+<p>数量：{{.qty}}</p>
+<p>总价：{{.total}}</p>
+<hr/>
+{{ end }}
+<hr/>
+<!-- []int{1,2,3} -->
+{{ range $a, $b := . }}
+<p>Index:{{ $a }}, ID: {{ .id }}</p>
+<hr/>
+{{ end }}
+</body>
+</html>
