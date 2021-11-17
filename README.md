@@ -71,6 +71,10 @@
    * 1.3 [表单进阶](https://www.bilibili.com/video/BV1iF411a72a/ "表单进阶")
    * 1.4 [认证与鉴权（上）](https://www.bilibili.com/video/BV1Sq4y1g7AW/ "认证与鉴权（上）")
    * 1.5 [认证与鉴权（中）](https://www.bilibili.com/video/BV1BT4y1979M/ "认证与鉴权（中）")
+   * 1.6 [认证与鉴权（下）](https://www.bilibili.com/video/BV1H34y1Z7z2/ "认证与鉴权（中）")
+   * 1.7 [模板（上）](https://www.bilibili.com/video/BV14P4y157VY/ "认证与鉴权（中）")
+   * 1.8 [模板（下）](https://www.bilibili.com/video/BV18Y411x7Am/ "认证与鉴权（中）")
+   * 1.9 [客户端与http测试.](https://www.bilibili.com/video/BV1wg411T7PZ/ "认证与鉴权（中）")
 
 ---
 
