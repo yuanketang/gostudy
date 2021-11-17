@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>逻辑和比较运算</title>
+</head>
+<body>
+<!-- if total > 300.0 -->
+{{ if (gt .total 300.0) }}
+<p>订单金额大于300.0</p>
+<!-- if total >= 200 && total < 300-->
+{{ else if and (ge .total 200.0) (lt .total 300.0)}}
+<p>订单金额大于等于200.0小于300.0</p>
+{{ else }}
+<p>订单金额小于200.0</p>
+{{ .total }}
+{{ end }}
+</body>
+</html>

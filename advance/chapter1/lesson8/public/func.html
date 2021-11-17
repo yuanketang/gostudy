@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>函数</title>
+</head>
+<body>
+<!-- println -->
+<p>println 内置函数</p>
+<pre>
+    {{ println . }}
+</pre>
+<!-- len -->
+<p>len 内置函数</p>
+<pre>
+    {{ len . }}
+</pre>
+
+<!-- index -->
+<p>index 内置函数</p>
+<pre>
+    {{ index . "price"}}
+    {{ index . "qty"}}
+</pre>
+<!-- 自定义函数 -->
+<hr>
+<!-- if total > 300.0 -->
+{{ if (gt .total 300.0) }}
+<p>订单金额大于300.0</p>
+<p>订单折扣：{{ discount .total 0.5}}</p>
+<!-- if total >= 200 && total < 300-->
+{{ else if and (ge .total 200.0) (lt .total 300.0)}}
+<p>订单金额大于等于200.0小于300.0</p>
+<p>订单折扣：{{ discount .total 0.8}}</p>
+{{ else }}
+<p>订单金额小于200.0</p>
+<p>订单折扣：{{ discount .total 0.9}}</p>
+{{ end }}
+</body>
+</html>

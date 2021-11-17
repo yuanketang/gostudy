@@ -1,0 +1,10 @@
+<ul>
+    {{ range . }}
+    <li>
+        <span>商品编号：{{ .id }}</span>
+        <span>商品名称：{{ .name }}</span>
+        <span>商品价格：{{ .price }}</span>
+        <span>商品数量：{{ .qty }}</span>
+    </li>
+    {{ end }}
+</ul>

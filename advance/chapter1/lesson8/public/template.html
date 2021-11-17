@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+{{ template "header.html" }}
+<body>
+<p>订单编号：{{ .id }}</p>
+<p>订单总价：{{ .total }}</p>
+{{ template "list.html" .goods }}
+<hr>
+<p>调用自定义define的模板</p>
+{{ template "define" .goods }}
+<hr>
+<p>调用自定义block的模板</p>
+<!-- 定义模板2 -->
+{{ block "define2" .goods}}
+    <ul>
+    {{ range . }}
+    <li>
+        <span>商品编号：{{ .id }}</span>
+        <span>商品名称：{{ .name }}</span>
+        <span>商品价格：{{ .price }}</span>
+        <span>商品数量：{{ .qty }}</span>
+    </li>
+    {{ end }}
+    </ul>
+{{ end }}
+</body>
+</html>
+<!-- 定义模板 -->
+{{ define "define" }}
+    <ul>
+    {{ range . }}
+    <li>
+        <span>商品编号：{{ .id }}</span>
+        <span>商品名称：{{ .name }}</span>
+        <span>商品价格：{{ .price }}</span>
+        <span>商品数量：{{ .qty }}</span>
+    </li>
+    {{ end }}
+    </ul>
+{{ end }}
