@@ -75,6 +75,7 @@
    * 1.7 [模板（上）](https://www.bilibili.com/video/BV14P4y157VY/ "模板（上）")
    * 1.8 [模板（下）](https://www.bilibili.com/video/BV18Y411x7Am/ "模板（下）")
    * 1.9 [客户端与http测试](https://www.bilibili.com/video/BV1wg411T7PZ/ "认证与鉴权（中）")
+2. Go数据库编程
    * 2.1 [MySQL](https://www.bilibili.com/video/BV11341187jW/ "MySQL")
 
 ---
