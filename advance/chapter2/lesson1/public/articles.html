@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文章列表</title>
+    <style>
+        dd {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<p>
+    <a href="/article">新增文章</a>
+</p>
+{{ range . }}
+<dl>
+    <dd>
+        <h3>{{ .title }}</h3>
+        <a href="/delete?id={{.id}}">删除[/article?id={{.id}}]</a>
+    </dd>
+    <dt>
+        <p>{{ .content }}</p>
+        <p>{{ .created_at }}</p>
+        <hr>
+    </dt>
+</dl>
+{{ end }}
+</body>
+</html>
