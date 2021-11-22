@@ -665,3 +665,22 @@ if err != nil {
 token.Valid
 // ...
 ```
+
+### 第二章 Go数据库编程
+---
+
+#### 1. MySQL
+
+安装依赖
+
+```shell
+go get -u github.com/go-sql-driver/mysql
+```
+
+#### 2. MongoDB
+
+安装依赖
+
+```shell
+go get -u go.mongodb.org/mongo-driver/mongo
+```

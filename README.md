@@ -77,6 +77,7 @@
    * 1.9 [客户端与http测试](https://www.bilibili.com/video/BV1wg411T7PZ/ "认证与鉴权（中）")
 2. Go数据库编程
    * 2.1 [MySQL](https://www.bilibili.com/video/BV11341187jW/ "MySQL")
+   * 2.2 [MongoDB](https://www.bilibili.com/video/BV1734y1o7ff/ "MongoDB")
 
 ---
 

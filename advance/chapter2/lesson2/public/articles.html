@@ -17,12 +17,12 @@
 {{ range . }}
 <dl>
     <dd>
-        <h3>{{ .title }}</h3>
-        <a href="/delete?id={{.id}}">删除[/article?id={{.id}}]</a>
+        <h3>{{ .Title }}</h3>
+        <a href="/delete?id={{.Id}}">删除[/article?id={{.Id}}]</a>
     </dd>
     <dt>
-        <p>{{ .content }}</p>
-        <p>{{ .created_at }}</p>
+        <p>{{ .Content }}</p>
+        <p>{{ .CreatedAt }}</p>
         <hr>
     </dt>
 </dl>
