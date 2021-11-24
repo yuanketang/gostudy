@@ -38,7 +38,7 @@
 
 2.查询本地缓存失败，会访问本地hosts文件，并检查是否有指定的匹配项。
 
-```shell
+```bash
 # localhost name resolution is handled within DNS itself.
 127.0.0.1       localhost
 ::1             localhost
@@ -360,7 +360,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
   
   * 文件上传
 
-  ```shell
+  ```{.line-numbers}
   // 10M
   const maxMemory = 10 << 20
   // 解析multipart-data, 注意第二个参数为字节数
@@ -513,7 +513,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
   添加自定义数据，比如一个UUID
 
-  ```shell
+  ```json
   {
     "iss": "yuanketang",
     "iat": "2021-11-05 00:00:00",
@@ -533,7 +533,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
   #### 5. Web服务的认证与鉴权（中）
 
   需要安装的依赖
-  ```shell
+  ```bash
   go get -u golang.org/x/oauth2
   go get -u github.com/go-oauth2/oauth2/v4
   ```
@@ -542,7 +542,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
   > 服务端实现
 
-  ```shell
+  ```
   // 步骤一：初始化一个Manager并配置
   // Manager 认证管理器
   manager := manage.NewDefaultManager()
@@ -585,7 +585,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
   > 客户端实现
 
-  ```shell
+  ```
   config = oauth2.Config{
     ClientID:     "客户端ID",
     ClientSecret: "客户端Secret",
@@ -606,7 +606,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
   ##### 客户端凭证模式的实现
 
-  ```shell
+  ```
   clientCfg := clientcredentials.Config{
     ClientID:     "客户端ID",
     ClientSecret: "客户端ID",
@@ -619,13 +619,13 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 #### 6. Web服务的认证与鉴权（下）
 > 安装依赖
 
-```shell
+```bash
 go get github.com/dgrijalva/jwt-go
 ```
 
 > 创建JWT Token
 
-```shell
+```
 // 使用claim创建一个JWT Token
 // 参数一：加密方式
 // 参数二：claim 可以理解为payload
@@ -642,7 +642,7 @@ tokenStr := token.SignedString(秘钥)
 
 > 解析JWT Token
 
-```shell
+```
 // 解析Token
 // 参数一：JWT Token String
 // 参数二：claim
@@ -673,7 +673,7 @@ token.Valid
 
 安装依赖
 
-```shell
+```bash
 go get -u github.com/go-sql-driver/mysql
 ```
 
@@ -681,6 +681,14 @@ go get -u github.com/go-sql-driver/mysql
 
 安装依赖
 
-```shell
+```bash
 go get -u go.mongodb.org/mongo-driver/mongo
+```
+
+#### 3. Redis
+
+安装依赖
+
+```bash
+go get -u github.com/go-redis/redis
 ```
