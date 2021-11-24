@@ -78,6 +78,7 @@
 2. Go数据库编程
    * 2.1 [MySQL](https://www.bilibili.com/video/BV11341187jW/ "MySQL")
    * 2.2 [MongoDB](https://www.bilibili.com/video/BV1734y1o7ff/ "MongoDB")
+   * 2.3 [Redis](https://www.bilibili.com/video/BV1vF411b74F/ "Redis")
 
 ---
 

@@ -1,6 +1,7 @@
 ![从零开始自学Go语言 - 进阶篇](https://cdn.yuanketang.cn/images/courses/02/cover.jpg)
 
 ### 第一章 Web编程基础
+
 ---
 #### 1. Web工作原理
 
@@ -542,7 +543,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
   > 服务端实现
 
-  ```
+  ```gotemplate
   // 步骤一：初始化一个Manager并配置
   // Manager 认证管理器
   manager := manage.NewDefaultManager()
@@ -585,7 +586,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
   > 客户端实现
 
-  ```
+  ```gotemplate
   config = oauth2.Config{
     ClientID:     "客户端ID",
     ClientSecret: "客户端Secret",
@@ -606,7 +607,7 @@ func (h MyHandle) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
   ##### 客户端凭证模式的实现
 
-  ```
+  ```gotemplate
   clientCfg := clientcredentials.Config{
     ClientID:     "客户端ID",
     ClientSecret: "客户端ID",
@@ -625,7 +626,7 @@ go get github.com/dgrijalva/jwt-go
 
 > 创建JWT Token
 
-```
+```gotemplate
 // 使用claim创建一个JWT Token
 // 参数一：加密方式
 // 参数二：claim 可以理解为payload
@@ -642,7 +643,7 @@ tokenStr := token.SignedString(秘钥)
 
 > 解析JWT Token
 
-```
+```gotemplate
 // 解析Token
 // 参数一：JWT Token String
 // 参数二：claim
@@ -667,6 +668,7 @@ token.Valid
 ```
 
 ### 第二章 Go数据库编程
+
 ---
 
 #### 1. MySQL
@@ -692,3 +694,50 @@ go get -u go.mongodb.org/mongo-driver/mongo
 ```bash
 go get -u github.com/go-redis/redis
 ```
+
+### 第三章 Go数据库编程
+
+---
+
+#### 1. WebSocket
+
+<div style="text-align:center;margin: 0 auto;">
+    <img src="E:\projects\gostudy\images\frame.png" alt="FRAME" />
+</div>
+
+FIN：1位，用来表明这是一个消息的最后的消息片断，当然第一个消息片断也可能是最后的一个消息片断；
+
+RSV1, RSV2, RSV3: 分别都是1位，如果双方之间没有约定自定义协议，那么这几位的值都必须为0,否则必须断掉WebSocket连接；
+
+Opcode:4位操作码，定义有效负载数据，如果收到了一个未知的操作码，连接也必须断掉，以下是定义的操作码：
+*  %x0 表示连续消息
+*  %x1 表示文本消息
+*  %x2 表未二进制消息
+*  %x3-7 为将来的非控制消息保留的操作码
+*  %x8 表示连接关闭
+*  %x9 表示心跳检查的ping
+*  %xA 表示心跳检查的pong
+*  %xB-F 为将来的控制消息的保留操作码
+
+Mask: 1位，定义传输的数据是否有加掩码，如果设置为1，掩码键必须放在masking-key区域。
+
+Payload length: 传输数据的长度，以字节的形式表示：7位、7+16位、或者7+64位。如果这个值以字节表示是0-125这个范围，那这个值就表示传输数据的长度；如果这个值是126，则随后的两个字节表示的是一个16进制无符号数，用来表示传输数据的长度；如果这个值是127,则随后的是8个字节表示的一个64位无符合数，这个数用来表示传输数据的长度。多字节长度的数量是以网络字节的顺序表示。负载数据的长度为扩展数据及应用数据之和，扩展数据的长度可能为0，因而此时负载数据的长度就为应用数据的长度。
+
+Masking-key: 0或4个字节，32位，掩码键只有在掩码位设置为1的时候存在。
+
+Payload data: (x+y)位，负载数据为扩展数据及应用数据长度之和。
+
+Extension data: x位，如果客户端与服务端之间没有特殊约定，那么扩展数据的长度始终为0，任何的扩展都必须指定扩展数据的长度，或者长度的计算方式，以及在握手时如何确定正确的握手方式。如果存在扩展数据，则扩展数据就会包括在负载数据的长度之内。
+
+Application data: y位，任意的应用数据，放在扩展数据之后，应用数据的长度=负载数据的长度-扩展数据的长度。
+
+```gotemplate
+h := sha1.New()
+h.Write([]byte(secKey))
+h.Write([]byte("258EAFA5-E914-47DA-95CA-C5AB0DC85B11"))
+return base64.StdEncoding.EncodeToString(h.Sum(nil))
+```
+
+#### 2. Tcp
+
+#### 3. Udp

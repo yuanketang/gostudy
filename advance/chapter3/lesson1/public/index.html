@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket</title>
+</head>
+<body>
+  <p>
+      <label for="message"></label>
+      <input type="text" id="message" placeholder="输入消息"/>
+      <button type="button" onclick="sendMessage()">发送</button>
+  </p>
+  <div id="status"></div>
+  <script>
+    const msg = document.getElementById("message");
+    const status = document.getElementById("status");
+    const socket = new WebSocket("ws://localhost:8080/ws");
+
+    socket.onopen = () => {
+      status.innerHTML += "Status: Connected\r\n";
+    };
+
+    socket.onclose = () => {
+      status.innerHTML += "Status: Disconnected\r\n";
+    };
+
+    socket.onerror = (e) => {
+      status.innerHTML += "Error: " + e.message + "\r\n";
+    };
+
+    socket.onmessage = (e) => {
+      status.innerHTML += "收到服务端发来的消息: " + e.data + "\r\n";
+    };
+
+    const sendMessage = () => {
+      socket.send(msg.value);
+      msg.value = "";
+    }
+  </script>
+</body>
+</html>
