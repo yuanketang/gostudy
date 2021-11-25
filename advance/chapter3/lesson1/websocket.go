@@ -11,7 +11,9 @@ import (
 )
 
 type WebSocket struct {
-	Conn net.Conn
+	Conn     net.Conn
+	MaskKey  []byte
+	IsMasked bool
 }
 
 func (ws *WebSocket) Close() error {
@@ -71,6 +73,28 @@ func (ws *WebSocket) generateKey(secKey string) string {
 	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
+func (ws *WebSocket) WriteMessage(data []byte) error {
+	payloadLen := len(data)
+	// * 实例仅考虑paylaod长度小于126情况
+	if payloadLen > 125 {
+		return errors.New("数据长度超出范围")
+	}
+	// 写第1个字节 1000 0001
+	ws.Conn.Write([]byte{0x81})
+	// 写第2个字节 0000 0000 | 0000 0111
+	ws.Conn.Write([]byte{byte(0x00) | byte(payloadLen)})
+	// 处理掩码
+	if ws.IsMasked {
+		maskedData := make([]byte, payloadLen)
+		for i := 0; i < payloadLen; i++ {
+			maskedData[i] = data[i] ^ ws.MaskKey[i%4]
+		}
+		ws.Conn.Write(maskedData)
+	}
+	ws.Conn.Write(data)
+	return nil
+}
+
 func (ws *WebSocket) ReceiveMessage() (data []byte, err error) {
 	// 读取前二个字节
 	n := make([]byte, 2)
@@ -81,24 +105,22 @@ func (ws *WebSocket) ReceiveMessage() (data []byte, err error) {
 		return nil, errors.New("不支持自定义扩展协议")
 	}
 
-	mask := n[1]&1<<7 != 0
+	ws.IsMasked = n[1]&1<<7 != 0
 	payloadLen := int(n[1] & 0x7f)
 	// TODO 需要判断下数据长度，是否有扩展数据
 
 	// 获取掩码
-	var maskData []byte
-	if mask {
-		maskData = make([]byte, 4)
-		_, _ = ws.Conn.Read(maskData)
+	if ws.IsMasked {
+		_, _ = ws.Conn.Read(ws.MaskKey)
 	}
 
 	payload := make([]byte, payloadLen)
 	_, _ = ws.Conn.Read(payload)
 	dataByte := make([]byte, payloadLen)
-	if mask {
+	if ws.IsMasked {
 		// 掩码算法 转换后数据[i] = 原始数据[i] ^ 掩码数据[i%4]
 		for i := 0; i < payloadLen; i++ {
-			dataByte[i] = payload[i] ^ maskData[i%4]
+			dataByte[i] = payload[i] ^ ws.MaskKey[i%4]
 		}
 	} else {
 		dataByte = payload
@@ -107,8 +129,8 @@ func (ws *WebSocket) ReceiveMessage() (data []byte, err error) {
 	log.Printf("fin %t\n", fin)
 	log.Printf("opcode %d\n", opcode)
 	log.Printf("payloadLen %d\n", payloadLen)
-	log.Printf("mask %t\n", mask)
-	log.Printf("maskData %b\n", maskData)
+	log.Printf("mask %t\n", ws.IsMasked)
+	log.Printf("maskData %b\n", ws.MaskKey)
 
 	// 如果是最后一帧
 	if fin {
@@ -132,13 +154,24 @@ func main() {
 	})
 
 	mu.HandleFunc("/ws", func(writer http.ResponseWriter, request *http.Request) {
-		ws := &WebSocket{}
+		ws := &WebSocket{
+			MaskKey: make([]byte, 4),
+		}
 		// 处理握手
 		err := ws.HandleShake(writer, request)
 		if err != nil {
 			http.Error(writer, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		//go func() {
+		//	for {
+		//		err = ws.WriteMessage([]byte("heartbeat...."))
+		//		time.Sleep(time.Second)
+		//		if err != nil {
+		//			break
+		//		}
+		//	}
+		//}()
 		// 消息处理
 		for {
 			data, err := ws.ReceiveMessage()

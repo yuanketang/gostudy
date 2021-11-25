@@ -17,19 +17,19 @@
     const socket = new WebSocket("ws://localhost:8080/ws");
 
     socket.onopen = () => {
-      status.innerHTML += "Status: Connected\r\n";
+      status.innerHTML += "<p>Status: Connected</p>";
     };
 
     socket.onclose = () => {
-      status.innerHTML += "Status: Disconnected\r\n";
+      status.innerHTML += "<p>Status: Disconnected</p>";
     };
 
     socket.onerror = (e) => {
-      status.innerHTML += "Error: " + e.message + "\r\n";
+      status.innerHTML += "<p>Error: " + e.message + "</p>";
     };
 
     socket.onmessage = (e) => {
-      status.innerHTML += "收到服务端发来的消息: " + e.data + "\r\n";
+      status.innerHTML += "<p>收到服务端发来的消息: " + e.data + "</p>";
     };
 
     const sendMessage = () => {
