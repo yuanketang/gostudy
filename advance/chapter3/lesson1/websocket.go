@@ -24,7 +24,7 @@ func (ws *WebSocket) Close() error {
 	return nil
 }
 
-func (ws *WebSocket) HandleShake(writer http.ResponseWriter, request *http.Request) error {
+func (ws *WebSocket) Handshake(writer http.ResponseWriter, request *http.Request) error {
 	// 检查请求头
 	secKey := request.Header.Get("Sec-Websocket-Key")
 	if secKey == "" {
@@ -158,7 +158,7 @@ func main() {
 			MaskKey: make([]byte, 4),
 		}
 		// 处理握手
-		err := ws.HandleShake(writer, request)
+		err := ws.Handshake(writer, request)
 		if err != nil {
 			http.Error(writer, err.Error(), http.StatusInternalServerError)
 			return
