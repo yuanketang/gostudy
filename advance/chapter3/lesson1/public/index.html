@@ -17,19 +17,15 @@
     const socket = new WebSocket("ws://localhost:8080/ws");
 
     socket.onopen = () => {
-      status.innerHTML += "<p>Status: Connected</p>";
+      status.innerHTML += "<p>状态: 已连接</p>";
     };
 
     socket.onclose = () => {
-      status.innerHTML += "<p>Status: Disconnected</p>";
+      status.innerHTML += "<p>状态: 断开连接</p>";
     };
 
     socket.onerror = (e) => {
-      status.innerHTML += "<p>Error: " + e.message + "</p>";
-    };
-
-    socket.onmessage = (e) => {
-      status.innerHTML += "<p>收到服务端发来的消息: " + e.data + "</p>";
+      status.innerHTML += "<p>错误: " + e.message + "</p>";
     };
 
     const sendMessage = () => {

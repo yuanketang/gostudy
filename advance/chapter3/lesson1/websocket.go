@@ -3,147 +3,110 @@ package main
 import (
 	"crypto/sha1"
 	"encoding/base64"
-	"errors"
 	"fmt"
+	"github.com/go-oauth2/oauth2/v4/errors"
 	"log"
 	"net"
 	"net/http"
 )
 
 type WebSocket struct {
-	Conn     net.Conn
-	MaskKey  []byte
-	IsMasked bool
+	Conn       net.Conn
+	IsMasked   bool
+	MaskingKey []byte
 }
 
-func (ws *WebSocket) Close() error {
-	err := ws.Conn.Close()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (ws *WebSocket) Handshake(writer http.ResponseWriter, request *http.Request) error {
-	// 检查请求头
-	secKey := request.Header.Get("Sec-Websocket-Key")
-	if secKey == "" {
-		return errors.New("请求头错误")
-	}
-	log.Println("Sec-Websocket-Key", secKey)
-
-	// TODO: 跨域检查
-
-	// 劫持http请求
-	h, ok := writer.(http.Hijacker)
-	if !ok {
-		return errors.New("请求错误")
-	}
-
-	conn, _, err := h.Hijack()
-	if err != nil {
-		return err
-	}
-
-	var buf []byte
-	p := buf[:0]
-	p = append(p, "HTTP/1.1 101 Switching Protocols\r\n"...)
-	p = append(p, "Upgrade: websocket\r\n"...)
-	p = append(p, "Connection: Upgrade\r\n"...)
-	p = append(p, "Sec-WebSocket-Accept: "...)
-	p = append(p, ws.generateKey(secKey)...)
-	p = append(p, "\r\n"...)
-
-	// 请求体和请求头中间的换行
-	p = append(p, "\r\n"...)
-	if _, err = conn.Write(p); err != nil {
-		conn.Close()
-		return err
-	}
-	ws.Conn = conn
-	return nil
-}
-
-func (ws *WebSocket) generateKey(secKey string) string {
-	// 构造规则：BASE64(SHA1(Sec-WebSocket-KeyGUID))
-	// GUID(RFC4122)
+func (ws *WebSocket) getKey(key string) string {
 	h := sha1.New()
-	h.Write([]byte(secKey))
+	h.Write([]byte(key))
 	h.Write([]byte("258EAFA5-E914-47DA-95CA-C5AB0DC85B11"))
 	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
-func (ws *WebSocket) WriteMessage(data []byte) error {
-	payloadLen := len(data)
-	// * 实例仅考虑paylaod长度小于126情况
-	if payloadLen > 125 {
-		return errors.New("数据长度超出范围")
+func (ws *WebSocket) HandShake(writer http.ResponseWriter, request *http.Request) error {
+	secKey := request.Header.Get("Sec-WebSocket-Key")
+	if secKey == "" {
+		return errors.New("请求头错误 Sec-WebSocket-Key")
 	}
-	// 写第1个字节 1000 0001
-	ws.Conn.Write([]byte{0x81})
-	// 写第2个字节 0000 0000 | 0000 0111
-	ws.Conn.Write([]byte{byte(0x00) | byte(payloadLen)})
-	// 处理掩码
-	if ws.IsMasked {
-		maskedData := make([]byte, payloadLen)
-		for i := 0; i < payloadLen; i++ {
-			maskedData[i] = data[i] ^ ws.MaskKey[i%4]
-		}
-		ws.Conn.Write(maskedData)
+
+	// 向客户端写入我们的相应头
+	// HTTP/1.1 101 Switching Protocols
+	// Connection: Upgrade
+	// Upgrade: websocket
+	// Sec-WebSocket-Accept: EiM9oIF3ryxCrPxNnH2XmQhMLnyp0RnG=
+
+	p := []byte{}
+	p = append(p, "HTTP/1.1 101 Switching Protocols\r\n"...)
+	p = append(p, "Connection: Upgrade\r\n"...)
+	p = append(p, "Upgrade: websocket\r\n"...)
+	p = append(p, "Sec-WebSocket-Accept: "...)
+	p = append(p, ws.getKey(secKey)...)
+	p = append(p, "\r\n"...)
+	p = append(p, "\r\n"...)
+
+	h, ok := writer.(http.Hijacker)
+	if !ok {
+		return errors.New("数据劫持失败")
 	}
-	ws.Conn.Write(data)
+	conn, _, err := h.Hijack()
+	if err != nil {
+		return errors.New("数据劫持失败")
+	}
+	ws.Conn = conn
+	if _, err = ws.Conn.Write(p); err != nil {
+		ws.Conn.Close()
+		return err
+	}
 	return nil
 }
 
 func (ws *WebSocket) ReceiveMessage() (data []byte, err error) {
-	// 读取前二个字节
 	n := make([]byte, 2)
 	_, _ = ws.Conn.Read(n)
+
+	// 1001 0001 1000 0000
 	fin := n[0]&1<<7 != 0
-	opcode := int(n[0] & 0xf)
 	if rsv := n[0] & (1<<6 | 1<<5 | 1<<4); rsv != 0 {
 		return nil, errors.New("不支持自定义扩展协议")
 	}
+	// 1001 0001 0000 1111
+	opcode := int(n[0] & 0xf)
 
 	ws.IsMasked = n[1]&1<<7 != 0
+	// 0000 0011 0111 1111
+	// <= 125 情况
 	payloadLen := int(n[1] & 0x7f)
-	// TODO 需要判断下数据长度，是否有扩展数据
 
-	// 获取掩码
-	if ws.IsMasked {
-		_, _ = ws.Conn.Read(ws.MaskKey)
-	}
-
+	// TODO: 作业
 	payload := make([]byte, payloadLen)
-	_, _ = ws.Conn.Read(payload)
-	dataByte := make([]byte, payloadLen)
 	if ws.IsMasked {
-		// 掩码算法 转换后数据[i] = 原始数据[i] ^ 掩码数据[i%4]
+		_, _ = ws.Conn.Read(ws.MaskingKey)
+	}
+	_, _ = ws.Conn.Read(payload)
+	originBytes := make([]byte, payloadLen)
+	// 32 8
+	if ws.IsMasked {
+		//  j = i MOD 4 transfromed-octed-i = original-octet-i XOR masking-key-octet-j
+		// 转换后数据 = 原始数据[i] ^ 掩码数据[i mod 4]
 		for i := 0; i < payloadLen; i++ {
-			dataByte[i] = payload[i] ^ ws.MaskKey[i%4]
+			originBytes[i] = payload[i] ^ ws.MaskingKey[i%4]
 		}
 	} else {
-		dataByte = payload
+		originBytes = payload
 	}
-	log.Printf("%b\n", n)
-	log.Printf("fin %t\n", fin)
-	log.Printf("opcode %d\n", opcode)
-	log.Printf("payloadLen %d\n", payloadLen)
-	log.Printf("mask %t\n", ws.IsMasked)
-	log.Printf("maskData %b\n", ws.MaskKey)
+	log.Printf("n: %b\n", n)
+	log.Printf("fin: %t\n", fin)
+	log.Println("opcode", opcode)
+	log.Printf("payloadLen: %d", payloadLen)
+	log.Printf("masking key: %b", ws.MaskingKey)
 
-	// 如果是最后一帧
 	if fin {
-		data = dataByte
+		data = originBytes
 		return data, nil
 	}
 
-	nextData, err := ws.ReceiveMessage()
-	if err != nil {
-		return nil, err
-	}
-	data = append(data, nextData...)
-	return data, nil
+	// TODO: 作业
+	return originBytes, nil
 }
 
 func main() {
@@ -154,33 +117,26 @@ func main() {
 	})
 
 	mu.HandleFunc("/ws", func(writer http.ResponseWriter, request *http.Request) {
+		// 1 实现握手
 		ws := &WebSocket{
-			MaskKey: make([]byte, 4),
+			MaskingKey: make([]byte, 4),
 		}
-		// 处理握手
-		err := ws.Handshake(writer, request)
+		err := ws.HandShake(writer, request)
 		if err != nil {
 			http.Error(writer, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		//go func() {
-		//	for {
-		//		err = ws.WriteMessage([]byte("heartbeat...."))
-		//		time.Sleep(time.Second)
-		//		if err != nil {
-		//			break
-		//		}
-		//	}
-		//}()
-		// 消息处理
+		defer ws.Conn.Close()
+		// 2 实现对数据报文解析
 		for {
 			data, err := ws.ReceiveMessage()
 			if err != nil {
-				ws.Close()
 				http.Error(writer, err.Error(), http.StatusInternalServerError)
-				break
+				return
 			}
-			log.Println("Data:", data)
+			if data != nil {
+				log.Println("Data:", string(data))
+			}
 		}
 	})
 
