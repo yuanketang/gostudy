@@ -79,6 +79,9 @@
    * 2.1 [MySQL](https://www.bilibili.com/video/BV11341187jW/ "MySQL")
    * 2.2 [MongoDB](https://www.bilibili.com/video/BV1734y1o7ff/ "MongoDB")
    * 2.3 [Redis](https://www.bilibili.com/video/BV1vF411b74F/ "Redis")
+3. Go网络编程
+   * 3.1 [WebSocket（上）](https://www.bilibili.com/video/BV1Cf4y1K7Ht/ "WebSocket（上）")
+   * 3.2 [WebSocket（下）](https://www.bilibili.com/video/BV1jL41177cm/ "WebSocket（下）")
 
 ---
 
